@@ -140,6 +140,6 @@ class _SearchListState extends State<SearchList> {
   }
 
   getCollectionDictionary() {
-    return FirebaseFirestore.instance.collection('dictionary').get();
+    return FirebaseFirestore.instance.collection('dictionary').orderBy('vi').get();
   }
 }
