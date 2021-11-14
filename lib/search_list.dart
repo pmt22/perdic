@@ -96,7 +96,7 @@ class _SearchListState extends State<SearchList> {
           builder: (context,
               AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
             if (snapshot.hasError) {
-              return const Text("Hình như có lỗi gì rồi, thử lại sau nhé");
+              return const Text("Hình như có lỗi gì rồi, thử lại sau nhé", style: TextStyle(color: Colors.red),);
             }
 
             if (snapshot.connectionState == ConnectionState.done) {
