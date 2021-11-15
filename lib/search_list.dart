@@ -80,7 +80,7 @@ class _SearchListState extends State<SearchList> {
               );
             }
 
-            if (!snapshot.hasData) {
+            if (snapshot.data!.docs.isEmpty) {
               return const Text("Danh sách chưa có gì hết");
             }
 

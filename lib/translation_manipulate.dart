@@ -9,8 +9,8 @@ class TranslationManipulate extends StatefulWidget {
   final Set<Translation> existingTranslations;
   final FutureOr<void> Function() callback;
 
-  const TranslationManipulate(this.inputTranslation, this.existingTranslations,
-      this.callback,
+  const TranslationManipulate(
+      this.inputTranslation, this.existingTranslations, this.callback,
       {Key? key})
       : super(key: key);
 
@@ -28,6 +28,20 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
     return Scaffold(
         appBar: AppBar(
           title: Text(isCreation ? 'Thêm mới' : 'Chỉnh sửa'),
+          actions: [
+            Visibility(child: IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                deleteTranslation(translation.id).then((value) {
+                  widget.callback.call();
+                  Navigator.pop(context);
+                });
+              },
+            ),
+              visible: !isCreation,
+            )
+
+          ],
         ),
         body: Center(
           child: Form(
@@ -38,30 +52,25 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
                   initialValue: isCreation ? null : translation.vi,
                   decoration: const InputDecoration(labelText: 'Tiếng Việt'),
                   validator: (val) => textValidation(val, true),
-                  onChanged: (val) => {
-                    freshTranslation!.vi = val
-                  },
+                  onChanged: (val) => {freshTranslation!.vi = val},
                 ),
                 TextFormField(
                   initialValue: isCreation ? null : translation.en,
                   decoration: const InputDecoration(labelText: 'Tiếng Anh'),
                   validator: (val) => textValidation(val, false),
-                  onChanged: (val) => {
-                    freshTranslation!.en = val
-                  },
+                  onChanged: (val) => {freshTranslation!.en = val},
                 ),
                 ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         if (isCreation) {
-                          addTranslationToFirestore(freshTranslation!).then((value) => translation.id = value.id);
+                          addTranslationToFirestore(freshTranslation!);
                         } else {
                           updateTranslation(freshTranslation!);
                         }
                         widget.callback.call();
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Lưu xong rồi đó')));
+                            const SnackBar(content: Text('Lưu xong rồi đó')));
                         Navigator.pop(context);
                       }
                     },
@@ -72,24 +81,33 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
         ));
   }
 
-  Future<DocumentReference> addTranslationToFirestore(Translation translation) {
+  Future<DocumentReference> addTranslationToFirestore(
+      Translation addingTranslation) {
     return FirebaseFirestore.instance
         .collection(Constant.firestoreDictionary())
         .add(<String, dynamic>{
-      'vi': translation.vi,
-      'en': translation.en,
+      'vi': addingTranslation.vi,
+      'en': addingTranslation.en,
       'timestamp': DateTime.now().millisecondsSinceEpoch
     });
   }
 
-  void updateTranslation(Translation translation) {
-    FirebaseFirestore.instance.collection(Constant.firestoreDictionary())
-        .doc(translation.id)
+  void updateTranslation(Translation updatingTranslation) {
+    FirebaseFirestore.instance
+        .collection(Constant.firestoreDictionary())
+        .doc(updatingTranslation.id)
         .update(<String, dynamic>{
-      'vi': translation.vi,
-      'en': translation.en,
+      'vi': updatingTranslation.vi,
+      'en': updatingTranslation.en,
       'timestamp': DateTime.now().millisecondsSinceEpoch
     });
+  }
+
+  Future<void> deleteTranslation(String? documentId) {
+    return FirebaseFirestore.instance
+        .collection(Constant.firestoreDictionary())
+        .doc(documentId)
+        .delete();
   }
 
   Translation get translation => widget.inputTranslation;
@@ -102,7 +120,9 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
     }
 
     if (widget.existingTranslations.contains(freshTranslation)) {
-      return isCreation ? 'Cặp từ này có rồi, nhập khác đi nha' : 'Sửa mà không khác gì thì lưu chi nè';
+      return isCreation
+          ? 'Cặp từ này có rồi, nhập khác đi nha'
+          : 'Sửa mà không khác gì thì lưu chi nè';
     }
     return null;
   }
