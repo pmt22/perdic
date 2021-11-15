@@ -12,7 +12,7 @@ class Translation {
   }
 
   @override
-  int get hashCode => vi.hashCode * 31 + en.hashCode * 31;
+  int get hashCode => vi.hashCode * 31 + en.hashCode;
 
   bool contains(String str) => vi.toUpperCase().contains(str.toUpperCase())
       || en.toUpperCase().contains(str.toUpperCase());
@@ -22,17 +22,16 @@ class Translation {
 
   bool isEmpty() => vi.isEmpty && en.isEmpty;
 
-  Translation copy() => Translation(vi, en);
+  Translation copy() {
+    Translation copy = Translation(vi, en);
+    copy.id = id;
+    return copy;
+  }
+
   void update(Translation updated) {
     vi = updated.vi;
     en = updated.en;
   }
 
   static Translation get empty => Translation('', '');
-}
-
-class TranslationService {
-  final Set<Translation> _translations = <Translation>{};
-
-  Set<Translation> get translations => _translations;
 }

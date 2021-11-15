@@ -14,9 +14,9 @@ class PerdicApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Từ điển của Thảo',
-      home: SearchList(TranslationService()),
+      home: SearchList(),
     );
   }
 }

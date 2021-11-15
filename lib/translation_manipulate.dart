@@ -1,13 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:perdic/constant.dart';
 import 'package:perdic/translation.dart';
 import 'dart:async';
 
 class TranslationManipulate extends StatefulWidget {
   final Translation inputTranslation;
-  final TranslationService translationService;
-  final FutureOr<void> Function(Translation) callback;
+  final Set<Translation> existingTranslations;
+  final FutureOr<void> Function() callback;
 
-  const TranslationManipulate(this.inputTranslation, this.translationService,
+  const TranslationManipulate(this.inputTranslation, this.existingTranslations,
       this.callback,
       {Key? key})
       : super(key: key);
@@ -49,21 +51,18 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
                   },
                 ),
                 ElevatedButton(
-                    onPressed: () async {
+                    onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        setState(() {
-                          if (isCreation) {
-                            translation.update(freshTranslation!);
-                            widget.translationService.translations.add(translation);
-                          } else {
-                            translation.update(freshTranslation!);
-                          }
-                        });
-                        Navigator.pop(context);
-                        await widget.callback.call(translation);
+                        if (isCreation) {
+                          addTranslationToFirestore(freshTranslation!).then((value) => translation.id = value.id);
+                        } else {
+                          updateTranslation(freshTranslation!);
+                        }
+                        widget.callback.call();
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text('Lưu xong rồi đó')));
+                        Navigator.pop(context);
                       }
                     },
                     child: const Text('Lưu'))
@@ -71,6 +70,26 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
             ),
           ),
         ));
+  }
+
+  Future<DocumentReference> addTranslationToFirestore(Translation translation) {
+    return FirebaseFirestore.instance
+        .collection(Constant.firestoreDictionary())
+        .add(<String, dynamic>{
+      'vi': translation.vi,
+      'en': translation.en,
+      'timestamp': DateTime.now().millisecondsSinceEpoch
+    });
+  }
+
+  void updateTranslation(Translation translation) {
+    FirebaseFirestore.instance.collection(Constant.firestoreDictionary())
+        .doc(translation.id)
+        .update(<String, dynamic>{
+      'vi': translation.vi,
+      'en': translation.en,
+      'timestamp': DateTime.now().millisecondsSinceEpoch
+    });
   }
 
   Translation get translation => widget.inputTranslation;
@@ -82,7 +101,7 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
       return 'Nhập gì đó dùm cái bạn ei!!!';
     }
 
-    if (widget.translationService.translations.contains(freshTranslation)) {
+    if (widget.existingTranslations.contains(freshTranslation)) {
       return isCreation ? 'Cặp từ này có rồi, nhập khác đi nha' : 'Sửa mà không khác gì thì lưu chi nè';
     }
     return null;

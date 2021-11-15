@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:perdic/constant.dart';
 import 'package:perdic/translation.dart';
 import 'package:perdic/translation_manipulate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
 class SearchList extends StatefulWidget {
-  final TranslationService translationService;
-
-  const SearchList(this.translationService, {Key? key}) : super(key: key);
+  const SearchList({Key? key}) : super(key: key);
 
   @override
   _SearchListState createState() => _SearchListState();
@@ -15,6 +14,7 @@ class SearchList extends StatefulWidget {
 
 class _SearchListState extends State<SearchList> {
   final filteredSet = <Translation>{};
+  final translationSet = <Translation>{};
   var searchText = '';
 
   @override
@@ -43,34 +43,12 @@ class _SearchListState extends State<SearchList> {
   void navigateToTranslationManipulate(Translation? translation) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return TranslationManipulate(
-          translation ?? Translation.empty, widget.translationService, (trans) {
+          translation ?? Translation.empty, translationSet, () {
         setState(() {
-          translation == null
-              ? addTranslationToFirestore(trans).then((value) => trans.id = value.id)
-              : updateTranslation(trans);
+          translationSet.clear();
         });
       });
     }));
-  }
-
-  Future<DocumentReference> addTranslationToFirestore(Translation translation) {
-    return FirebaseFirestore.instance
-        .collection('dictionary')
-        .add(<String, dynamic>{
-      'vi': translation.vi,
-      'en': translation.en,
-      'timestamp': DateTime.now().millisecondsSinceEpoch
-    });
-  }
-
-  void updateTranslation(Translation translation) {
-    FirebaseFirestore.instance.collection('dictionary')
-        .doc(translation.id)
-        .update(<String, dynamic>{
-      'vi': translation.vi,
-      'en': translation.en,
-      'timestamp': DateTime.now().millisecondsSinceEpoch
-    });
   }
 
   Widget buildBody() {
@@ -96,15 +74,22 @@ class _SearchListState extends State<SearchList> {
           builder: (context,
               AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
             if (snapshot.hasError) {
-              return const Text("Hình như có lỗi gì rồi, thử lại sau nhé", style: TextStyle(color: Colors.red),);
+              return const Text(
+                "Hình như có lỗi gì rồi, thử lại sau nhé",
+                style: TextStyle(color: Colors.red),
+              );
+            }
+
+            if (!snapshot.hasData) {
+              return const Text("Danh sách chưa có gì hết");
             }
 
             if (snapshot.connectionState == ConnectionState.done) {
               for (var document in snapshot.data!.docs) {
-                Translation translation = Translation(
-                    document['vi'], document['en']);
+                Translation translation =
+                    Translation(document['vi'], document['en']);
                 translation.id = document.id;
-                widget.translationService.translations.add(translation);
+                translationSet.add(translation);
               }
 
               return Expanded(child: buildTranslationList());
@@ -133,13 +118,14 @@ class _SearchListState extends State<SearchList> {
     return ListView(children: divided);
   }
 
-  Set<Translation> get translationSet => widget.translationService.translations;
-
   Iterable getListToBuild() {
     return searchText.isNotEmpty ? filteredSet : translationSet;
   }
 
   getCollectionDictionary() {
-    return FirebaseFirestore.instance.collection('dictionary').orderBy('vi').get();
+    return FirebaseFirestore.instance
+        .collection(Constant.firestoreDictionary())
+        .orderBy('vi')
+        .get();
   }
 }
