@@ -9,8 +9,8 @@ class TranslationManipulate extends StatefulWidget {
   final Set<Translation> existingTranslations;
   final FutureOr<void> Function() callback;
 
-  const TranslationManipulate(
-      this.inputTranslation, this.existingTranslations, this.callback,
+  const TranslationManipulate(this.inputTranslation, this.existingTranslations,
+      this.callback,
       {Key? key})
       : super(key: key);
 
@@ -33,10 +33,6 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
               icon: const Icon(Icons.delete),
               onPressed: () {
                 showDeleteConfirmation(context);
-                // deleteTranslation(translation.id).then((value) {
-                //   widget.callback.call();
-                //   Navigator.pop(context);
-                // });
               },
             ),
               visible: !isCreation,
@@ -50,16 +46,19 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
             child: Column(
               children: [
                 TextFormField(
+                  autofocus: true,
                   initialValue: isCreation ? null : translation.vi,
                   decoration: const InputDecoration(labelText: 'Tiếng Việt'),
                   validator: (val) => textValidation(val, true),
                   onChanged: (val) => {freshTranslation!.vi = val},
+                  textInputAction: TextInputAction.next,
                 ),
                 TextFormField(
                   initialValue: isCreation ? null : translation.en,
                   decoration: const InputDecoration(labelText: 'Tiếng Anh'),
                   validator: (val) => textValidation(val, false),
                   onChanged: (val) => {freshTranslation!.en = val},
+                  textInputAction: TextInputAction.next,
                 ),
                 ElevatedButton(
                     onPressed: () {
@@ -91,8 +90,14 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
               title: Text('Xác nhận'),
               content: Center(child: Text('Bạn có chắc chắn muốn xóa?')),
               actions: [
-                TextButton(onPressed: () => print('Hủy'), child: Text('Hủy')),
-                TextButton(onPressed: () => print('OK'), child: Text('OK')),
+                TextButton(onPressed: () => Navigator.pop(context), child: Text('Hủy')),
+                TextButton(onPressed: () =>
+                  deleteTranslation(translation.id).then((value) {
+                  widget.callback.call();
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  })
+                , child: Text('OK')),
               ],
             )
           ],
@@ -106,7 +111,9 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
         .add(<String, dynamic>{
       'vi': addingTranslation.vi,
       'en': addingTranslation.en,
-      'timestamp': DateTime.now().millisecondsSinceEpoch
+      'timestamp': DateTime
+          .now()
+          .millisecondsSinceEpoch
     });
   }
 
@@ -117,7 +124,9 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
         .update(<String, dynamic>{
       'vi': updatingTranslation.vi,
       'en': updatingTranslation.en,
-      'timestamp': DateTime.now().millisecondsSinceEpoch
+      'timestamp': DateTime
+          .now()
+          .millisecondsSinceEpoch
     });
   }
 
