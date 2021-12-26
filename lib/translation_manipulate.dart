@@ -49,36 +49,52 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
                   autofocus: true,
                   initialValue: isCreation ? null : translation.vi,
                   decoration: const InputDecoration(labelText: 'Tiếng Việt'),
-                  validator: (val) => textValidation(val, true),
-                  onChanged: (val) => {freshTranslation!.vi = val},
+                  validator: (val) {
+                    freshTranslation!.vi = val!;
+                    return textValidation(val, true);
+                  } ,
                   textInputAction: TextInputAction.next,
                 ),
                 TextFormField(
                   initialValue: isCreation ? null : translation.en,
                   decoration: const InputDecoration(labelText: 'Tiếng Anh'),
-                  validator: (val) => textValidation(val, false),
-                  onChanged: (val) => {freshTranslation!.en = val},
-                  textInputAction: TextInputAction.next,
+                  validator: (val) {
+                    freshTranslation!.en = val!;
+                    return textValidation(val, false);
+                  },
+                  onFieldSubmitted: (value) {
+                    submit(context);
+                  },
                 ),
                 ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        if (isCreation) {
-                          addTranslationToFirestore(freshTranslation!);
-                        } else {
-                          updateTranslation(freshTranslation!);
-                        }
-                        widget.callback.call();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Lưu xong rồi đó')));
-                        Navigator.pop(context);
-                      }
+                      submit(context);
                     },
                     child: const Text('Lưu'))
               ],
             ),
           ),
         ));
+  }
+
+  void submit(BuildContext context) {
+    if (_formKey.currentState!.validate()) {
+      var validation = validateTranslation();
+      if (validation != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(validation), duration: const Duration(seconds: 3), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
+      } else {
+        if (isCreation) {
+          addTranslationToFirestore(freshTranslation!);
+        } else {
+          updateTranslation(freshTranslation!);
+        }
+        widget.callback.call();
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Lưu xong rồi đó'), duration: Duration(seconds: 1), behavior: SnackBarBehavior.floating, backgroundColor: Colors.green));
+        Navigator.pop(context);
+      }
+    }
   }
 
   void showDeleteConfirmation(BuildContext context) {
@@ -146,10 +162,12 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
       return 'Nhập gì đó dùm cái bạn ei!!!';
     }
 
-    if (widget.existingTranslations.contains(freshTranslation)) {
-      return isCreation
-          ? 'Cặp từ này có rồi, nhập khác đi nha'
-          : 'Sửa mà không khác gì thì lưu chi nè';
+    return null;
+  }
+
+  String? validateTranslation() {
+    if (widget.existingTranslations.contains(freshTranslation) && freshTranslation != translation) {
+      return 'Cặp từ này có rồi, nhập khác đi nha';
     }
     return null;
   }
