@@ -53,6 +53,7 @@ class _SearchListState extends State<SearchList> {
 
   Widget buildBody() {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
           decoration: const InputDecoration(

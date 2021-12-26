@@ -32,10 +32,11 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
             Visibility(child: IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
-                deleteTranslation(translation.id).then((value) {
-                  widget.callback.call();
-                  Navigator.pop(context);
-                });
+                showDeleteConfirmation(context);
+                // deleteTranslation(translation.id).then((value) {
+                //   widget.callback.call();
+                //   Navigator.pop(context);
+                // });
               },
             ),
               visible: !isCreation,
@@ -78,6 +79,23 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
               ],
             ),
           ),
+        ));
+  }
+
+  void showDeleteConfirmation(BuildContext context) {
+    showDialog(context: context, builder: (context) =>
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AlertDialog(
+              title: Text('Xác nhận'),
+              content: Center(child: Text('Bạn có chắc chắn muốn xóa?')),
+              actions: [
+                TextButton(onPressed: () => print('Hủy'), child: Text('Hủy')),
+                TextButton(onPressed: () => print('OK'), child: Text('OK')),
+              ],
+            )
+          ],
         ));
   }
 

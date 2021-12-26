@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "712000603037",
-    "firebase_url": "https://perdic-ebe48.firebaseio.com",
-    "project_id": "perdic-ebe48",
-    "storage_bucket": "perdic-ebe48.appspot.com"
+    "project_number": "387118727171",
+    "firebase_url": "https://course-project-12a3f.firebaseio.com",
+    "project_id": "course-project-12a3f",
+    "storage_bucket": "course-project-12a3f.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:712000603037:android:c6d63672ebc91536942574",
+        "mobilesdk_app_id": "1:387118727171:android:f099ff31c300b282ba4e36",
         "android_client_info": {
           "package_name": "vn.pmt.perdic"
         }
       },
       "oauth_client": [
         {
-          "client_id": "712000603037-if2hlecjdi5sf8rgh1h7uab0u8fjuigf.apps.googleusercontent.com",
+          "client_id": "387118727171-7flhmuvapvl810nhhq74e0a1mogcf4c3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB5vHaHz3pxk1ajt1OoRIrbO6KEiOFnbns"
+          "current_key": "AIzaSyCwLSloi57om0uaCU12vEitY5rYdeBTU2k"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "712000603037-if2hlecjdi5sf8rgh1h7uab0u8fjuigf.apps.googleusercontent.com",
+              "client_id": "387118727171-7flhmuvapvl810nhhq74e0a1mogcf4c3.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
