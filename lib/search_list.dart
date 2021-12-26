@@ -1,9 +1,9 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:perdic/constant.dart';
 import 'package:perdic/translation.dart';
 import 'package:perdic/translation_manipulate.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:async';
 
 class SearchList extends StatefulWidget {
   const SearchList({Key? key}) : super(key: key);
@@ -13,12 +13,73 @@ class SearchList extends StatefulWidget {
 }
 
 class _SearchListState extends State<SearchList> {
+  final _formKey = GlobalKey<FormState>();
+
   final filteredSet = <Translation>{};
   final translationSet = <Translation>{};
+  final passcodeSet = <String>{};
   var searchText = '';
+  bool authorized = false;
 
   @override
   Widget build(BuildContext context) {
+    return authorized ? authorizedMain() : unauthorizedMain();
+  }
+
+  Scaffold unauthorizedMain() {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Passcode'),
+      ),
+      body: FutureBuilder(
+          future: getCollectionAuthorization(),
+          builder: (BuildContext context,
+              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+            if (snapshot.hasError) {
+              return const Text(
+                "Hình như có lỗi gì rồi, thử lại sau nhé",
+                style: TextStyle(color: Colors.red),
+              );
+            }
+
+            if (snapshot.connectionState == ConnectionState.done) {
+              for (var document in snapshot.data!.docs) {
+                passcodeSet.add(document.data()['passcode']);
+              }
+
+              return Center(
+                  child: Form(
+                      key: _formKey,
+                      child: Container(
+                        width: 300,
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                              hintText: 'Passcode',
+                              hintStyle: TextStyle(fontWeight: FontWeight.w100)),
+                          obscureText: true,
+                          autofocus: true,
+                          validator: (value) {
+                            if (!passcodeSet.contains(value)) {
+                              return 'Passcode sai bét rồi';
+                            }
+                          },
+                          onFieldSubmitted: (val) {
+                            if (_formKey.currentState!.validate()) {
+                              setState(() {
+                                authorized = true;
+                              });
+                            }
+                          },
+                        ),
+                      )));
+            }
+
+            return const Center(child: CircularProgressIndicator());
+          }),
+    );
+  }
+
+  Scaffold authorizedMain() {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Danh sách'),
@@ -127,6 +188,12 @@ class _SearchListState extends State<SearchList> {
     return FirebaseFirestore.instance
         .collection(Constant.firestoreDictionary())
         .orderBy('vi')
+        .get();
+  }
+
+  getCollectionAuthorization() {
+    return FirebaseFirestore.instance
+        .collection(Constant.firestoreAuthorization())
         .get();
   }
 
