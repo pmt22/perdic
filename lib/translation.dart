@@ -7,12 +7,12 @@ class Translation {
 
   @override
   bool operator ==(Object other) {
-    return vi.toUpperCase() == (other as Translation).vi.toUpperCase()
-        && en.toUpperCase() == (other).en.toUpperCase();
+    return vi.trim().toUpperCase() == (other as Translation).vi.trim().toUpperCase()
+        && en.trim().toUpperCase() == (other).en.trim().toUpperCase();
   }
 
   @override
-  int get hashCode => vi.hashCode * 31 + en.hashCode;
+  int get hashCode => vi.trim().toUpperCase().hashCode * 31 + en.trim().toUpperCase().hashCode;
 
   bool contains(String str) => normalize(vi.toLowerCase()).contains(normalize(str.toLowerCase()))
       || normalize(en.toLowerCase()).contains(normalize(str.toLowerCase()));
