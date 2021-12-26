@@ -14,8 +14,8 @@ class Translation {
   @override
   int get hashCode => vi.hashCode * 31 + en.hashCode;
 
-  bool contains(String str) => vi.toUpperCase().contains(str.toUpperCase())
-      || en.toUpperCase().contains(str.toUpperCase());
+  bool contains(String str) => normalize(vi.toLowerCase()).contains(normalize(str.toLowerCase()))
+      || normalize(en.toLowerCase()).contains(normalize(str.toLowerCase()));
 
   @override
   String toString() => vi + ' — ' + en;
@@ -34,4 +34,15 @@ class Translation {
   }
 
   static Translation get empty => Translation('', '');
+
+  String normalize(String str) {
+    var withDia = 'áàảạãăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ';
+    var withoutDia = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd';
+
+    for (int i = 0; i < withDia.length; i++) {
+      str = str.replaceAll(withDia[i], withoutDia[i]);
+    }
+
+    return str;
+  }
 }

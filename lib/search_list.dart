@@ -59,6 +59,7 @@ class _SearchListState extends State<SearchList> {
           decoration: const InputDecoration(
               hintText: 'Tìm kiếm bằng tiếng Việt và Anh',
               hintStyle: TextStyle(fontWeight: FontWeight.w100)),
+          autofocus: true,
           onChanged: (str) {
             setState(() {
               searchText = str;
