@@ -12,7 +12,7 @@ class Translation {
   }
 
   @override
-  int get hashCode => vi.trim().toUpperCase().hashCode * 31 + en.trim().toUpperCase().hashCode;
+  int get hashCode => vi.trim().toUpperCase().hashCode * 31 + en.trim().toUpperCase().hashCode * 31;
 
   bool contains(String str) => normalize(vi.toLowerCase()).contains(normalize(str.toLowerCase()))
       || normalize(en.toLowerCase()).contains(normalize(str.toLowerCase()));
