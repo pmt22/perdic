@@ -43,6 +43,6 @@ class Translation {
       str = str.replaceAll(withDia[i], withoutDia[i]);
     }
 
-    return str;
+    return str.trim();
   }
 }
