@@ -9,8 +9,8 @@ class TranslationManipulate extends StatefulWidget {
   final Set<Translation> existingTranslations;
   final FutureOr<void> Function() callback;
 
-  const TranslationManipulate(this.inputTranslation, this.existingTranslations,
-      this.callback,
+  const TranslationManipulate(
+      this.inputTranslation, this.existingTranslations, this.callback,
       {Key? key})
       : super(key: key);
 
@@ -29,15 +29,15 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
         appBar: AppBar(
           title: Text(isCreation ? 'Thêm mới' : 'Chỉnh sửa'),
           actions: [
-            Visibility(child: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                showDeleteConfirmation(context);
-              },
-            ),
+            Visibility(
+              child: IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  showDeleteConfirmation(context);
+                },
+              ),
               visible: !isCreation,
             )
-
           ],
         ),
         body: Center(
@@ -52,7 +52,7 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
                   validator: (val) {
                     freshTranslation!.vi = val!;
                     return textValidation(val, true);
-                  } ,
+                  },
                   textInputAction: TextInputAction.next,
                 ),
                 TextFormField(
@@ -66,11 +66,15 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
                     submit(context);
                   },
                 ),
-                ElevatedButton(
-                    onPressed: () {
-                      submit(context);
-                    },
-                    child: const Text('Lưu'))
+                SizedBox(
+                  width: 100,
+                  height: 50,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        submit(context);
+                      },
+                      child: const Text('Lưu')),
+                )
               ],
             ),
           ),
@@ -81,8 +85,11 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
     if (_formKey.currentState!.validate()) {
       var validation = validateTranslation();
       if (validation != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(validation), duration: const Duration(seconds: 3), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(validation),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating));
       } else {
         if (isCreation) {
           addTranslationToFirestore(freshTranslation!);
@@ -90,34 +97,41 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
           updateTranslation(freshTranslation!);
         }
         widget.callback.call();
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Lưu xong rồi đó'), duration: Duration(seconds: 1), behavior: SnackBarBehavior.floating, backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Lưu xong rồi đó'),
+            duration: Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.green));
         Navigator.pop(context);
       }
     }
   }
 
   void showDeleteConfirmation(BuildContext context) {
-    showDialog(context: context, builder: (context) =>
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AlertDialog(
-              title: Text('Xác nhận'),
-              content: Center(child: Text('Bạn có chắc chắn muốn xóa?')),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: Text('Hủy')),
-                TextButton(onPressed: () =>
-                  deleteTranslation(translation.id).then((value) {
-                  widget.callback.call();
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  })
-                , child: Text('OK')),
+    showDialog(
+        context: context,
+        builder: (context) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AlertDialog(
+                  title: Text('Xác nhận'),
+                  content: Center(child: Text('Bạn có chắc chắn muốn xóa?')),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Hủy')),
+                    TextButton(
+                        onPressed: () =>
+                            deleteTranslation(translation.id).then((value) {
+                              widget.callback.call();
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            }),
+                        child: Text('OK')),
+                  ],
+                )
               ],
-            )
-          ],
-        ));
+            ));
   }
 
   Future<DocumentReference> addTranslationToFirestore(
@@ -127,9 +141,7 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
         .add(<String, dynamic>{
       'vi': addingTranslation.vi,
       'en': addingTranslation.en,
-      'timestamp': DateTime
-          .now()
-          .millisecondsSinceEpoch
+      'timestamp': DateTime.now().millisecondsSinceEpoch
     });
   }
 
@@ -140,9 +152,7 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
         .update(<String, dynamic>{
       'vi': updatingTranslation.vi,
       'en': updatingTranslation.en,
-      'timestamp': DateTime
-          .now()
-          .millisecondsSinceEpoch
+      'timestamp': DateTime.now().millisecondsSinceEpoch
     });
   }
 
@@ -166,7 +176,8 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
   }
 
   String? validateTranslation() {
-    if (widget.existingTranslations.contains(freshTranslation) && freshTranslation != translation) {
+    if (widget.existingTranslations.contains(freshTranslation) &&
+        freshTranslation != translation) {
       return 'Cặp từ này có rồi, nhập khác đi nha';
     }
     return null;
