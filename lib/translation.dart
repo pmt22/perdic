@@ -2,6 +2,7 @@ class Translation {
   String? id;
   String vi;
   String en;
+  String? note;
 
   Translation(this.vi, this.en);
 
@@ -24,6 +25,7 @@ class Translation {
 
   Translation copy() {
     Translation copy = Translation(vi, en);
+    copy.note = note;
     copy.id = id;
     return copy;
   }

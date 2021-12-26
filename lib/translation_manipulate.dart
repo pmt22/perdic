@@ -55,6 +55,7 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
                   },
                   textInputAction: TextInputAction.next,
                 ),
+                const SizedBox(height: 10),
                 TextFormField(
                   initialValue: isCreation ? null : translation.en,
                   decoration: const InputDecoration(labelText: 'Tiếng Anh'),
@@ -66,6 +67,16 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
                     submit(context);
                   },
                 ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  initialValue: isCreation ? null : translation.note,
+                  decoration: const InputDecoration(labelText: 'Ghi chú'),
+                  onChanged: (val) => freshTranslation!.note = val,
+                  onFieldSubmitted: (value) {
+                    submit(context);
+                  },
+                ),
+                const SizedBox(height: 10),
                 SizedBox(
                   width: 100,
                   height: 50,
@@ -141,6 +152,7 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
         .add(<String, dynamic>{
       'vi': addingTranslation.vi,
       'en': addingTranslation.en,
+      'note': addingTranslation.note,
       'timestamp': DateTime.now().millisecondsSinceEpoch
     });
   }
@@ -152,6 +164,7 @@ class _TranslationManipulateState extends State<TranslationManipulate> {
         .update(<String, dynamic>{
       'vi': updatingTranslation.vi,
       'en': updatingTranslation.en,
+      'note': updatingTranslation.note,
       'timestamp': DateTime.now().millisecondsSinceEpoch
     });
   }

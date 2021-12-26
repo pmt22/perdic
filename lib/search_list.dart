@@ -63,11 +63,7 @@ class _SearchListState extends State<SearchList> {
           onChanged: (str) {
             setState(() {
               searchText = str;
-              filteredSet.clear();
-              if (str.isNotEmpty) {
-                filteredSet.addAll(translationSet);
-                filteredSet.retainWhere((trans) => trans.contains(str));
-              }
+              resetFilteredSet();
             });
           },
         ),
@@ -89,10 +85,13 @@ class _SearchListState extends State<SearchList> {
             if (snapshot.connectionState == ConnectionState.done) {
               for (var document in snapshot.data!.docs) {
                 Translation translation =
-                    Translation(document['vi'], document['en']);
+                    Translation(document.data()['vi'], document.data()['en']);
+                translation.note = document.data()['note'];
                 translation.id = document.id;
                 translationSet.add(translation);
               }
+
+              resetFilteredSet();
 
               return Expanded(child: buildTranslationList());
             }
@@ -129,5 +128,13 @@ class _SearchListState extends State<SearchList> {
         .collection(Constant.firestoreDictionary())
         .orderBy('vi')
         .get();
+  }
+
+  void resetFilteredSet() {
+    if (searchText.isNotEmpty) {
+      filteredSet.clear();
+      filteredSet.addAll(translationSet);
+      filteredSet.retainWhere((trans) => trans.contains(searchText));
+    }
   }
 }
