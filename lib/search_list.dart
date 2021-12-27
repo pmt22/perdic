@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,8 @@ class _SearchListState extends State<SearchList> {
   final translationSet = <Translation>{};
   final passcodeSet = <String>{};
   var searchText = '';
-  bool authorized = false;
+  bool authorized = true;
+  StreamController<String> dictionarySize = StreamController();
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +84,12 @@ class _SearchListState extends State<SearchList> {
   Scaffold authorizedMain() {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Danh sách'),
+        title: StreamBuilder(stream: dictionarySize.stream, builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            return Text(snapshot.data!);
+          }
+          return const Text('Danh sách');
+        },),
         actions: [
           IconButton(
               onPressed: () {
@@ -154,6 +161,8 @@ class _SearchListState extends State<SearchList> {
 
               resetFilteredSet();
 
+              dictionarySize.add('Danh sách (' + currentSetSize().toString() + ')');
+
               return Expanded(child: buildTranslationList());
             }
 
@@ -163,6 +172,8 @@ class _SearchListState extends State<SearchList> {
       ],
     );
   }
+
+  currentSetSize() => (searchText.isEmpty ? translationSet.length : filteredSet.length);
 
   Widget buildTranslationList() {
     final tiles = getListToBuild().map((trans) {
