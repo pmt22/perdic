@@ -20,7 +20,7 @@ class _SearchListState extends State<SearchList> {
   final translationSet = <Translation>{};
   final passcodeSet = <String>{};
   var searchText = '';
-  bool authorized = true;
+  bool authorized = false;
   StreamController<String> dictionarySize = StreamController();
 
   @override
