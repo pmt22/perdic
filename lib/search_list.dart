@@ -199,6 +199,7 @@ class _SearchListState extends State<SearchList> {
     return FirebaseFirestore.instance
         .collection(Constant.firestoreDictionary())
         .orderBy('vi')
+        .orderBy('en')
         .get();
   }
 
