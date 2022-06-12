@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:perdic/constant.dart';
 import 'package:perdic/translation.dart';
 import 'package:perdic/translation_manipulate.dart';
+import 'package:perdic/word_category_manipulate.dart';
 
 class SearchList extends StatefulWidget {
   const SearchList({Key? key}) : super(key: key);
@@ -25,7 +26,7 @@ class _SearchListState extends State<SearchList> {
 
   @override
   Widget build(BuildContext context) {
-    return authorized ? authorizedMain() : unauthorizedMain();
+    return authorizedMain();
   }
 
   Scaffold unauthorizedMain() {
@@ -94,7 +95,14 @@ class _SearchListState extends State<SearchList> {
           IconButton(
               onPressed: () {
                 setState(() {
-                  onAddButtonClicked();
+                  onAddNewWordTypeButtonClicked();
+                });
+              },
+              icon: const Icon(Icons.app_registration)),
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  onAddNewWordButtonClicked();
                 });
               },
               icon: const Icon(Icons.add))
@@ -104,8 +112,14 @@ class _SearchListState extends State<SearchList> {
     );
   }
 
-  void onAddButtonClicked() {
+  void onAddNewWordButtonClicked() {
     navigateToTranslationManipulate(null);
+  }
+
+  void onAddNewWordTypeButtonClicked() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return WordCategoryManipulate();
+    }));
   }
 
   void navigateToTranslationManipulate(Translation? translation) {
@@ -125,7 +139,7 @@ class _SearchListState extends State<SearchList> {
       children: [
         TextField(
           decoration: const InputDecoration(
-              hintText: 'Tìm kiếm bằng tiếng Việt và Anh',
+              hintText: 'Tìm kiếm bằng tiếng Việt hoặc Anh',
               hintStyle: TextStyle(fontWeight: FontWeight.w100)),
           autofocus: true,
           onChanged: (str) {
